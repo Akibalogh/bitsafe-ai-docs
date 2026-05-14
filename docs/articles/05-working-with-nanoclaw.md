@@ -134,6 +134,14 @@ The fourth interface is the most consequential and the least visible: how humans
 
 The frame worth ending on: **the AI is like a junior employee.** It works, the human corrects, the correction becomes durable memory, the next time it doesn't make the mistake. The corrections compound. The institutional learning rate of the system is bounded only by the rate at which humans correct it. After six months, the population of memory files is the company's accumulated wisdom about how this particular AI fails — and how it should succeed.
 
+## The two hard limits
+
+Two things NanoClaw doesn't do, and won't, even as everything else expands.
+
+**NanoClaw doesn't talk to customers.** Customer-facing communication stays human-to-human. The bot drafts the email, prepares the answer, surfaces the right context from prior threads — but a human signs and sends. Making a customer talk to a bot feels disrespectful in a way that's hard to walk back: it tells them their time is worth less than ours, and that nothing in the conversation requires creative judgment specific to them. Internal augmentation only. The leverage NanoClaw gives the team is felt on the customer's behalf, not aimed at the customer directly.
+
+**NanoClaw doesn't send money.** No payments, no transfers, no wallet operations, no on-chain transactions, no off-chain disbursements. The reasoning is simple: if there's a bug, we don't want it losing money, sending it to the wrong place, or — worst case — getting hijacked by an attacker who finds a path the bot didn't realize was a path. Financial actions stay behind a human signature.
+
 ## Closing
 
 Four interfaces. Personas for active conversation. Alerts for passive notification. Memory for persistence. HITL for collaboration. Most AI tools give you one — the chatbot. NanoClaw gives you four, and the leverage is in how they compose.
