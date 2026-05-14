@@ -59,7 +59,7 @@ Aki → Naval ("should we partner with X?")
        Aki ← Naval's synthesized recommendation, with Saibot's objections folded in
 ```
 
-Round-trip: ~90 seconds. Cost: a fraction of an Opus call. Cognitive load on Aki: read one synthesized message and push back on what doesn't land. The premortem move — "imagine this fails in six months, what does the autopsy say" — is one of the canonical Saibot dispatches; we ship `premortem` as a standalone skill so the pattern is available even when Naval isn't in the loop.
+Round-trip: ~90 seconds. Cognitive load on Aki: read one synthesized message and push back on what doesn't land. The premortem move — "imagine this fails in six months, what does the autopsy say" — is one of the canonical Saibot dispatches; we ship `premortem` as a standalone skill so the pattern is available even when Naval isn't in the loop.
 
 The personas aren't architectural primitives — they're examples of a pattern. The pattern: take a shared agent substrate, vary the system prompt and the grounding corpus, give the result a name and a voice, route by intent. Other companies will build their own cast.
 
