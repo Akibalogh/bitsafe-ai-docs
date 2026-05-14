@@ -12,13 +12,13 @@ This is **case study content**, not a framework manual. The upstream NanoClaw pr
 
 ## The article series
 
-| # | Layer | Title | Status |
-|---|---|---|---|
-| 1 | Infra + Security | [Building a Company-Wide AI Assistant](https://hub.bitsafe.finance/company-wide-ai-assistant) | published |
-| 2 | Foundation | [NanoClaw Architecture](https://hub.bitsafe.finance/nanoclaw-architecture) | published |
-| 3 | Operations | The Autonomous Engine — Loops, CI/CD, ARQ + Swarms, Observability | drafting |
-| 4 | Substrate | The Substrate — Notion-as-OS, Data, Code, Knowledge, and Tools | drafting |
-| 5 | App / Top | Working With NanoClaw — Personas, Alerts, Memory, Decision Support, and How Humans Teach the AI | drafting |
+| # | Layer | Title | Source | Status |
+|---|---|---|---|---|
+| 1 | Infra + Security | [Building a Company-Wide AI Assistant](https://hub.bitsafe.finance/company-wide-ai-assistant) | [`01-company-wide-ai-assistant.md`](docs/articles/01-company-wide-ai-assistant.md) | published |
+| 2 | Foundation | [NanoClaw Architecture](https://hub.bitsafe.finance/nanoclaw-architecture) | [`02-architecture.md`](docs/articles/02-architecture.md) | published |
+| 3 | Operations | The Autonomous Engine — Loops, CI/CD, ARQ + Swarms, Observability | [`03-autonomous-engine.md`](docs/articles/03-autonomous-engine.md) | drafting |
+| 4 | Substrate | The Substrate — Notion-as-OS, Data, Code, Knowledge, and Tools | [`04-substrate.md`](docs/articles/04-substrate.md) | drafting |
+| 5 | App / Top | Working With NanoClaw — Personas, Alerts, Memory, Decision Support, and How Humans Teach the AI | [`05-working-with-nanoclaw.md`](docs/articles/05-working-with-nanoclaw.md) | drafting |
 
 Articles are published as-ready to BitSafe's hub (`hub.bitsafe.finance`); drafts and source live here.
 
