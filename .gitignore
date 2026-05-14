@@ -1,0 +1,29 @@
+# Editor
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Drafts / WIP
+drafts/wip/
+_local/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Node
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Secrets — never commit
+.env
+.env.local
+*.pem
+*.key
