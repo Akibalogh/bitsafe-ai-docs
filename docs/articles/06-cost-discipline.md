@@ -159,9 +159,50 @@ The two shrinkages we wired in:
 
 Combined per-spawn savings, after wire-in and host-side mount: ~7,700 fewer input tokens per non-heavy spawn. At ~3,000 spawns/week, ~23M fewer billable tokens/week.
 
-## What's left, and what we learned
+## The Haiku triage layer — a small, smart model as the router
 
-The Haiku triage layer is in flight. The current architecture intercepts inbound short messages at the Slack-event handler, runs a fast Haiku classifier (~$0.0003/call), and routes to one of three paths: *direct answer* (Haiku writes the reply itself), *cache lookup* (a host-side script reads a local cache and formats the answer), or *full agent* (fall through to a container spawn). The triage layer ships first in shadow mode — every classification logged to `data/haiku-triage-decisions.jsonl`, but the bypass is OFF — for a one-week measurement window. After we verify the false-positive rate is under 5%, we'll flip the switch. The projection is ~$220-450/month of additional savings, depending on how aggressively the cache-lookup handlers catch repeat patterns.
+The most architecturally interesting lever shipped today isn't a cron or a watchdog — it's the Haiku triage layer. Worth a section of its own because the pattern generalizes beyond cost.
+
+The orthodoxy in agent systems is that the strongest model serves every request: Opus or its peers at the top of the stack, gated only by the user typing the explicit "use opus" / "use haiku" override. The result is that *every* inbound message — from `"hi"` to *"evaluate the tradeoff between a token-launch model and a subscription model given our current cash position"* — pays for the same expensive container spawn. Most messages do not deserve that.
+
+The first attempt at fixing this was deterministic shortcuts (Phase 1): seven regex patterns intercepting the absolute-cheapest cases (`/help`, single-word greetings, plain `thanks`) before any LLM is involved. That works at $0 marginal cost, but Aki was right to push back: regex is brittle. *"hey @NanoClaw thanks but actually can you also check X"* matches the `thanks` regex, reacts 👍, and silently drops the actual request. Typos, phrasing variants, and mixed intent all leak through.
+
+The Phase 2 answer was to put Haiku itself in the routing seat. Haiku 4.5 is roughly 1/100th the cost of a Sonnet spawn and 1/500th of an Opus spawn. At those rates, it's cheap enough to be the *router and the answerer*, not just a classifier.
+
+The runtime flow:
+
+```
+inbound msg
+  → bot-mute / access-control / per-thread rate-limit         (existing)
+  → deterministic shortcuts (Phase 1, 0-cost — keep for the unambiguous cases)
+  → Haiku triage (Phase 2)                              [~$0.0006/call, measured]
+      ├── direct_answer:  Haiku writes the reply itself, no container spawn
+      ├── cache_lookup:   host-side script reads a local cache (calendar, Tasks DB,
+      │                    slack-cache, etc.), formats the reply, no container spawn
+      └── full_agent:     fall through to container — model-router picks Sonnet/Opus
+```
+
+The classifier prompt is intentionally narrow. Haiku gets a 600-token system prompt enumerating the three intents, the recognized cache-lookup targets (`next_meeting`, `today_tasks`, `slack_thread_summary`, etc.), and a few hard rules:
+
+- *"If the message asks you to DO something (send, post, write, file, schedule, delete, modify), intent = full_agent."*
+- *"If the message contains the phrase 'use opus', intent = full_agent."*
+- *"If unsure, intent = full_agent (better to over-spawn than under-answer)."*
+
+Response shape is forced JSON: `{intent, response?, target?, confidence: 0.0-1.0}`. Below a 0.85 confidence threshold the message falls through to a full container spawn. Five hard guards short-circuit *before* the Haiku call even fires: admin sender (Aki — his messages are complex by default and bypass triage entirely), bot senders (no cross-talk), messages over 200 characters, messages matching tool-requiring verbs (`send|post|write|file|schedule|delete|modify`), and MPIM channels.
+
+Three properties make this work as a cost lever specifically:
+
+**Haiku is cheap enough to be wrong.** A misclassification costs us $0.0006 plus a follow-up container spawn (~$0.10). At those numbers, the "if unsure, full_agent" rule has near-zero downside — over-spawning is much cheaper than under-answering. Compare to a classifier that costs the same as the spawn it's replacing: there's no asymmetry, the lever evaporates.
+
+**The cache-lookup intent unlocks a *new* response class.** "What's my next meeting?", "what's on my Tasks DB for today?", "summarize this thread" — these are all questions whose answer already exists in a local cache. A full container spawn pays an Opus or Sonnet bill to do what amounts to a SQLite read + a `printf`. The triage layer routes those to a Python script that does exactly the SQLite read and the printf, with Haiku composing the natural-language wrapper. The container is bypassed entirely.
+
+**Shadow mode makes the rollout debuggable.** Phase 2a ships the triage layer with the bypass switch OFF — every classification decision logged to `data/haiku-triage-decisions.jsonl`, every message still flowing through to a container. After a week of logs, we'll see exactly which classifications would have short-circuited correctly and which would have produced a wrong answer. The flip from shadow to live is gated on the measured false-positive rate being under 5%. If the data says it's higher than that, we tune the prompt or the threshold before flipping — no production user sees a bad answer.
+
+Conservative projection from the design doc, after measured per-call cost ($0.000577 for the live test): ~$220-360/month. Higher-volume estimate, once Phase 2b is well-tuned: ~$375/month. Combined with Phase 1's deterministic shortcuts (which catches the absolute-cheapest at $0): ~$400-500/month from the routing layer alone.
+
+The wider pattern is *small models as workflow primitives*. Treat the cheap model not as a worse version of the strong model, but as a different kind of component — a router, a triage gate, a formatter, an oracle for "is this even worth spawning the strong model for?" The cost structure makes them effectively free for that role, and the asymmetry between miss cost (a follow-up spawn) and hit value (a full spawn avoided) does the rest.
+
+## What's left, and what we learned
 
 Three meta-lessons worth keeping:
 
