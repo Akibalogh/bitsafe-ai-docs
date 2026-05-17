@@ -63,7 +63,7 @@ PRICING_PER_1M = {
 }
 ```
 
-Recomputing May 2026 against the corrected table moved MTD from $11,137 → $14,092 — a 26.5% revision. Crucially, the auto-throttle's threshold checks (`MTD > 90% of target`) now fire on the *real* spend, not the under-counted version.
+Recomputing May 2026 against the corrected table moved MTD from $11,137 → $14,092 — a 26.5% revision. The auto-throttle's threshold checks (`MTD > 90% of target`) now fire on a closer-to-real number, not the under-counted version. (Honest caveat: our corrected tracker still over-counts against Anthropic's console — $14,092 vs $9,941 — because we apply the 2× tier multiplier uniformly to cache-read tokens, and Anthropic appears to bill cache-reads closer to the standard rate even on extended-context rows. Calibrating against the console number is a follow-up; the auto-throttle still errs on the safe side in the interim.)
 
 ### Lever 4: The skill-detected → Opus shortcut
 
