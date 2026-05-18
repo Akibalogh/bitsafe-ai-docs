@@ -9,6 +9,8 @@ Each published article on `hub.bitsafe.finance` has a source Markdown file here,
 | 3 | [`03-autonomous-engine.md`](03-autonomous-engine.md) | [hub.bitsafe.finance/03-autonomous-engine](https://hub.bitsafe.finance/03-autonomous-engine) | drafting |
 | 4 | [`04-substrate.md`](04-substrate.md) | [hub.bitsafe.finance/04-substrate](https://hub.bitsafe.finance/04-substrate) | drafting |
 | 5 | [`05-working-with-nanoclaw.md`](05-working-with-nanoclaw.md) | [hub.bitsafe.finance/05-working-with-nanoclaw](https://hub.bitsafe.finance/05-working-with-nanoclaw) | drafting |
+| 6 | [`06-cost-discipline.md`](06-cost-discipline.md) | [hub.bitsafe.finance/06-cost-discipline](https://hub.bitsafe.finance/06-cost-discipline) | drafting |
+| 7 | [`07-monitors-and-alerts.md`](07-monitors-and-alerts.md) | [hub.bitsafe.finance/07-monitors-and-alerts](https://hub.bitsafe.finance/07-monitors-and-alerts) | drafting |
 
 ## Authoring conventions
 
