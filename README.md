@@ -23,6 +23,14 @@ This is **case study content**, not a framework manual. The upstream NanoClaw pr
 
 Articles are published as-ready to BitSafe's hub (`hub.bitsafe.finance`); drafts and source live here.
 
+## Specs
+
+Forward-looking architecture proposals (separate from the retrospective case-study articles).
+
+| Spec | Source |
+|---|---|
+| Code Factory MVP — 24x7 Autonomous SDLC Pipeline | [`code-factory-mvp-spec.md`](docs/specs/code-factory-mvp-spec.md) |
+
 ## Contributing
 
 Issues + PRs welcome. The system itself reviews proposed changes — there's a bot called **Noob Saibot** that argues against any PR by default (it's a feature). Address it head-on in your PR description and you'll have an easier review.
