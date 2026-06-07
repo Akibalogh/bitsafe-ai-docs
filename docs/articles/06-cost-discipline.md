@@ -3,7 +3,7 @@ title: "Cost Discipline — Why the Bill Grew, What We Caught, How to Catch It S
 slug: 06-cost-discipline
 series: How BitSafe Runs on Notion
 part: 6
-published: 2026-05-17
+published: 2026-06-07
 audience: [App Developers, Trading Firms, Investors]
 ---
 
@@ -213,3 +213,69 @@ Three meta-lessons worth keeping:
 **Conservative defaults beat optimistic defaults.** The `skill_detected → Opus` shortcut was an optimistic default — "skills imply complex reasoning, so route them to the best model." In practice, most skill invocations are routine. Conservative defaults — Sonnet for skills, with an explicit Opus opt-in for the few that genuinely need it — saved more than the boundary tuning ever would. The same logic applies to the 1M-context tier: it's a flag you opt into for the rare conversation that needs it, not a default.
 
 The system itself reviewed this draft in Notion before publication. The next part covers what happens after cost is under control — the question that's harder than "how much does it cost" is "what do we want it to do."
+
+## June 2026 — second act: the router invert and the long tail
+
+Three weeks after the May postmortem shipped, the bill started creeping again. On 2026-06-05 the daily total was $454 — over the $400 ceiling — and the trailing 7-day mean was $407 vs the $333 sustainable target. The lever set from May was still active and still working; the May fixes hadn't regressed. What had grown underneath them was a different shape of cost, hidden in a different blind spot.
+
+A Friday-evening sub-agent (`data/state/cost-optimization-deep-think-2026-06-05.md`, read-only) walked the per-spawn telemetry and found one structural issue dominating everything else: **67.9% of all spawn cost was flowing to scheduled tasks, and every single scheduled-task spawn was running on Sonnet**. The code comment in `src/model-router.ts` said *"Scheduled tasks default to haiku"*; the actual scoring path escalated to Sonnet whenever `score > HAIKU_BOUNDARY`, which it usually did. The comment was aspirational. The behavior was the opposite.
+
+### The single Monday action
+
+Commit `52a037640` — *invert scheduled-task default Sonnet→Haiku (cost-opt P1)* — flipped the default and added three explicit escape hatches. Scheduled tasks now run Haiku unless one of these matches:
+
+- A `MODEL: SONNET` directive in the task body (explicit opt-in for routine tasks that genuinely need it)
+- A skill match against `SKILL_OPUS_ALLOWLIST` (commission, redline, premortem, etc. — caps at Sonnet, not Opus)
+- A content match against `OPUS_BOOST_RE` (cross-reference, deep-dive, tradeoff language — also Sonnet, capped)
+
+Rollback is a one-line env var: `NANOCLAW_SCHEDULED_HAIKU_DEFAULT=0`.
+
+The live evidence in `logs/model-routing.jsonl` is unusually clean:
+
+```
+2026-06-07T08:45:27.117Z reason=skill_detected tier=default
+2026-06-07T08:50:13.435Z reason=skill_detected tier=haiku
+```
+
+Every 15-minute scheduled-task fire before the merge logged `tier=default`. Every fire after logged `tier=haiku`. No gradual shift, no edge cases — a hard line right at the merge point.
+
+### The compounding layers
+
+The same day, `feat/cost-levers-b1-i1-i2` (commit `faaf77621`) landed three more levers on top of the inverted default:
+
+- **B1 — `SKILL_HAIKU_LIST`**: an explicit Haiku-class skills allowlist, counterpart to the existing `SKILL_OPUS_ALLOWLIST`. 29 skills enumerated — cache, sync, cleanup, monitor, distill. `skill_detected → default` was the second-biggest leak at 4,258 spawns over 14 days; this routes the deterministic-ETL portion of that bucket to Haiku.
+- **I1 — admin-channel hard-cap**: any spawn with `chatJid` matching the admin channel forces Haiku unless a skill match wins. The admin channel exists for terse alerts (Pattern #30: 1-2 sentences max); Sonnet-level reasoning is wasted there.
+- **I2 — notion-webhook hard-cap**: same shape as I1, for the Notion webhook surface. "Summarize this page" queries get Haiku.
+
+And the cron tune (F1, host-side, not part of the commit) deduplicated three identical `short-window-crash-rate.sh` lines and bumped four `*/5 * * * *` monitors to `*/15` or hourly. Zero direct Anthropic cost — but it cuts host CPU and reduces the cron-driven scheduled-task fire rate.
+
+### The dispatch-order fix
+
+A second branch the same week — `feat/dispatch-p-code-first` — was unrelated to the router but adjacent in shape. The Tasks DB executor was sorting candidates by `min(tier_score, label_score)`, which meant Tier dominated. With 30 P1s in the backlog, a P1 Tier-5 (research) item would lose dispatch order to a P2 Tier-1 (ops) item. Aki's exact question: *"does it automatically go from p0 to p1 etc?"* The answer, until that commit, was no — it went tier-first.
+
+The new ordering: P-code dominates, T0 incident hard-overrides everything, tier is a tiebreaker, last-edited is FIFO. Rollback via `NANOCLAW_DISPATCH_LEGACY_TIER_SORT=1`.
+
+### Two meta-lessons
+
+**Code comments lie when they're aspirational.** The scheduled-task code's comment said *"default to haiku"* but the actual flow escalated to Sonnet on >50% of cases. The comment described the *intent*; the audit had to find the *behavior*. Read the spawn logs, not the source.
+
+**A one-day deep-think shipped $1,400-1,600/wk savings; the marginal next-lever would have shipped ~$50-100/wk.** Same arc as the May 17 work — the first 30% of effort captures 80% of the value, and then yield collapses. Pattern #35's stopping rule applied: stop iterating when the next retro produces only "things to monitor" rather than ship-able fixes.
+
+### Projected impact
+
+Pre-fix 7-day mean was $407/day. Post-fix projects $200-250/day after a 24-48h settle. Yesterday (2026-06-06) was already $74 — an 84% drop from the $454 peak — *before* the router invert engaged at 08:49 UTC this morning. The fixes will compound through the week.
+
+### What's queued, not shipped
+
+The 2026-06-07 additional-levers analysis surfaced four more candidates, scoped for next week:
+
+- **C1 — CLAUDE.md eager-load trim** (~$60-100/wk). The file is 76,938 chars × 3,529 spawns/14d = 67M cache-create tokens. Most of the patterns can move to `docs/CLAUDE-DETAILS.md` with one-line summaries left in place.
+- **E1 — Wall-clock auto-resume max-N cap** (~$25-40/wk). 78 spawns ran >1700s in 14 days; a cap-at-2 on auto-resume saves roughly 30% of the wall-clock-halt tail.
+- **G1 — Tool-loop early-abort** (~$80-120/wk). Same-tool >15× in 10 minutes → abort with a scope-reduction request. Targets the top-decile spawns that account for 73% of cost.
+- **I3 — Force-Haiku per-task DB UPDATE** (~$150-200/wk). Prepend `MODEL: HAIKU` to every `scheduled_tasks` row whose prompt doesn't already specify a model.
+
+A Gemini Flash adapter spike is deferred to 2026-06-21 evaluation. The quality-parity bar for routine ETL is ≥95% — worth running, but only if B1+C1 haven't already closed the gap.
+
+### What we still can't see
+
+Per-rep / per-skill / per-Tasks-DB-row spawn attribution is partial. The cost-opt sub-agent had to back-of-envelope a lot of the per-skill numbers from regex matches against task prompts. Building cleaner attribution — a `skill_id` and `task_id` column on every cost-telemetry row, plumbed through the credential proxy — remains the next observability follow-up. *Observability is still the entire game.* The May postmortem fixed one layer of it; this round needed another.
