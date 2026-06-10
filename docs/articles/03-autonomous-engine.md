@@ -65,7 +65,7 @@ The CI pipeline makes every other loop safe to change. An agent can push a fix a
 
 ## ARQ + swarms + parallelism
 
-The interactive system runs **20 concurrent agent containers** (`MAX_CONCURRENT_TASKS=20`). Most AI-team setups run one chatbot at a time. Twenty is not a vanity number — it is what is required to keep a 14-person company's worth of Slack threads, scheduled tasks, and ARQ items moving in parallel.
+The interactive system runs a pool of concurrent agent containers, sized by a single `MAX_CONCURRENT_TASKS` config (in the teens — we tune it up and down as the cost and throughput data come in). Most AI-team setups run one chatbot at a time. The concurrency is not a vanity number — it is what is required to keep a small company's worth of Slack threads, scheduled tasks, and ARQ items moving in parallel. (We deliberately keep the live number out of the prose: it's a config that drifts, and a document that hard-codes it becomes wrong the next time we tune it — exactly the stale-memorized-fact trap Part 8 is about.)
 
 **Worktree isolation.** Each sub-agent gets its own git worktree under `.claude/worktrees/<task-id>` so two agents working on the same repo cannot stomp each other's branches. The worktree pattern was hard-won: before it landed, parallel agents would commit to the wrong branch when HEAD drifted mid-session. Now an agent does `git checkout <their-branch>` immediately before staging, and the worktree contract enforces the isolation. Build agents are wired with `isolation: "worktree"` by default; Notion-only research agents run unisolated because they do not touch the filesystem.
 
@@ -75,7 +75,7 @@ The interactive system runs **20 concurrent agent containers** (`MAX_CONCURRENT_
 
 **Pipeline bottleneck.** Running 4+ parallel feature branches at once chokes auto-promote. Smoke watches serialize on `flock`; five branches in flight queue end-to-end for ~2.5 hours. `[hotfix]` shortens the watch to 5 minutes, and `promote-to-prod.sh --auto --hotfix <branch>` can inject a branch into the front of the queue. Parallelizing the smoke watch is on the roadmap.
 
-The shape worth noting: parallelism is not free, and it is not the model that makes it valuable. The model is fast. The shipped, tested, deployed code path is what is slow. The investment in dispatch governors, worktree isolation, and the auto-promote pipeline is what lets 20 agents work concurrently without melting the host.
+The shape worth noting: parallelism is not free, and it is not the model that makes it valuable. The model is fast. The shipped, tested, deployed code path is what is slow. The investment in dispatch governors, worktree isolation, and the auto-promote pipeline is what lets a pool of agents work concurrently without melting the host.
 
 ## Cost tracking + cost telemetry
 

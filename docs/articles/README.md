@@ -11,6 +11,7 @@ Each published article on `hub.bitsafe.finance` has a source Markdown file here,
 | 5 | [`05-working-with-nanoclaw.md`](05-working-with-nanoclaw.md) | [hub.bitsafe.finance/05-working-with-nanoclaw](https://hub.bitsafe.finance/05-working-with-nanoclaw) | drafting |
 | 6 | [`06-cost-discipline.md`](06-cost-discipline.md) | [hub.bitsafe.finance/06-cost-discipline](https://hub.bitsafe.finance/06-cost-discipline) | drafting |
 | 7 | [`07-monitors-and-alerts.md`](07-monitors-and-alerts.md) | [hub.bitsafe.finance/07-monitors-and-alerts](https://hub.bitsafe.finance/07-monitors-and-alerts) | drafting |
+| 8 | [`08-capability-coverage-and-harness-guards.md`](08-capability-coverage-and-harness-guards.md) | [hub.bitsafe.finance/08-capability-coverage-and-harness-guards](https://hub.bitsafe.finance/08-capability-coverage-and-harness-guards) | drafting |
 
 ## Authoring conventions
 
