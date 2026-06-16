@@ -12,7 +12,7 @@ Thanks for your interest. Here's how to submit changes.
 1. Fork + branch from `main`.
 2. Make the change — prose, code snippet, or new article.
 3. Open a PR. Describe what changes + why.
-4. Expect Noob Saibot to argue against your change. That's the system working as intended; respond to the substance.
+4. Expect the adversarial reviewer to argue against your change. That's the system working as intended; respond to the substance.
 5. Merge happens after one BitSafe maintainer approves.
 
 ## Article style

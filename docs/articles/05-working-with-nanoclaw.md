@@ -39,7 +39,7 @@ The active interface — the one most people picture when they hear "AI assistan
 **People-modeled personas** are recognizable thinking styles, grounded in a corpus.
 
 - **Naval** (in the spirit of Naval Ravikant) is the first-principles synthesizer. Brief, asks questions, network-thinking, uncomfortable with consensus. Summon Naval when a decision feels too easy — when the room has lined up but nobody has stress-tested why. The corpus lives at `data/naval-corpus/` (Almanack, Venture Hacks essays, podcast transcripts).
-- **Noob Saibot** (the Mortal Kombat shadow ninja) is the adversarial red-team. Argues against any proposal by default. Naval summons Saibot when his own synthesis feels too clean — "make the strongest case against this." Saibot has earned his keep most clearly on security review, where the cost of a missed objection is high and the cost of an extra round of paranoia is low.
+- **The red-team** is the adversarial persona. Argues against any proposal by default. Naval summons it when his own synthesis feels too clean — "make the strongest case against this." It has earned its keep most clearly on security review, where the cost of a missed objection is high and the cost of an extra round of paranoia is low.
 - **Matthiasbot** is a retrievable knowledge base of Matthias Frank's published Notion information-architecture work, sourced from his website and YouTube channel. Grounds the bot in the framework (PARA, atomic databases, rollups vs. relations) so BitSafe agents can answer Notion-IA questions without scheduling time with Matthias. Every thread opens with the disclaimer: *"I'm Matthiasbot, trained on Matthias Frank's public content, not Matthias himself."*
 
 **Function-modeled personas** are domain roles.
@@ -52,14 +52,14 @@ All of them run on the same Claude substrate (Opus 4.7 today, whatever ships tom
 ```
 Aki → Naval ("should we partner with X?")
        ↓ (~30 seconds in)
-       Naval → Noob Saibot ("strongest case against partnering with X")
+       Naval → red-team ("strongest case against partnering with X")
        ↓ (~60 seconds later)
-       Naval ← Saibot's three best objections
+       Naval ← the red-team's three best objections
        ↓
-       Aki ← Naval's synthesized recommendation, with Saibot's objections folded in
+       Aki ← Naval's synthesized recommendation, with the objections folded in
 ```
 
-Round-trip: ~90 seconds. Cognitive load on Aki: read one synthesized message and push back on what doesn't land. The premortem move — "imagine this fails in six months, what does the autopsy say" — is one of the canonical Saibot dispatches; we ship `premortem` as a standalone skill so the pattern is available even when Naval isn't in the loop.
+Round-trip: ~90 seconds. Cognitive load on Aki: read one synthesized message and push back on what doesn't land. The premortem move — "imagine this fails in six months, what does the autopsy say" — is one of the canonical red-team dispatches; we ship `premortem` as a standalone skill so the pattern is available even when Naval isn't in the loop.
 
 The personas aren't architectural primitives — they're examples of a pattern. The pattern: take a shared agent substrate, vary the system prompt and the grounding corpus, give the result a name and a voice, route by intent. Other companies will build their own cast.
 
@@ -106,13 +106,13 @@ Skills complete the picture as procedural memory. SKILL.md frontmatter plus comp
 
 ## Decision support
 
-The most distinctive use of NanoClaw isn't task automation — it's decision support. The Naval + Noob Saibot pair is the canonical workflow. A strategic question goes to Naval; Naval synthesizes; if the synthesis feels too clean, Naval dispatches Saibot for the strongest counter-argument; the final output is the synthesis with the best objection folded in. Two specific techniques have earned their place.
+The most distinctive use of NanoClaw isn't task automation — it's decision support. The Naval + red-team pair is the canonical workflow. A strategic question goes to Naval; Naval synthesizes; if the synthesis feels too clean, Naval dispatches the red-team for the strongest counter-argument; the final output is the synthesis with the best objection folded in. Two specific techniques have earned their place.
 
-**Premortem**, in the Gary Klein sense, lives as a standalone skill at `/root/nanoclaw-skills/premortem/`. Before a major commitment — a deal close, a hire, a deprecation — Saibot is asked to imagine the failure mode six months out in vivid detail (the specific customer that churned, the specific bug, the specific competitor move) and walk *backwards* to what we should have seen today. The vividness matters: an abstract premortem produces hedging; a vivid premortem produces actions.
+**Premortem**, in the Gary Klein sense, lives as a standalone skill at `/root/nanoclaw-skills/premortem/`. Before a major commitment — a deal close, a hire, a deprecation — the red-team is asked to imagine the failure mode six months out in vivid detail (the specific customer that churned, the specific bug, the specific competitor move) and walk *backwards* to what we should have seen today. The vividness matters: an abstract premortem produces hedging; a vivid premortem produces actions.
 
 **Reference-class forecasting** is in flight. The M4 reference-class library is an ARQ initiative to populate base rates for the decisions BitSafe makes repeatedly — validator partnerships close at this rate, infrastructure migrations take this long, marketing channels with these characteristics produce this CAC. When it ships, Naval will surface the base rate alongside the synthesis: "similar deals close at 30%, here are the three closest analogs."
 
-The longer arc: the ARQ research item on the AI Board Member (`35a636dd-0ba5-8162`) carries the "Findings: AI Board Member — Competency Gaps & Decision Support Framework" page that scoped what AI decision support should mean for BitSafe. Naval and Noob Saibot are the operationalization of that framework. The framework will outlive the personas; the personas will be replaced as we learn what works.
+The longer arc: the ARQ research item on the AI Board Member (`35a636dd-0ba5-8162`) carries the "Findings: AI Board Member — Competency Gaps & Decision Support Framework" page that scoped what AI decision support should mean for BitSafe. Naval and the red-team are the operationalization of that framework. The framework will outlive the personas; the personas will be replaced as we learn what works.
 
 ## The HITL teaching loop
 
