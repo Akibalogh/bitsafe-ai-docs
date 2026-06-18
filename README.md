@@ -35,7 +35,7 @@ Forward-looking architecture proposals (separate from the retrospective case-stu
 
 ## Contributing
 
-Issues + PRs welcome. The system itself reviews proposed changes — there's a bot called **Noob Saibot** that argues against any PR by default (it's a feature). Address it head-on in your PR description and you'll have an easier review.
+Issues + PRs welcome. The system itself reviews proposed changes — there's an adversarial reviewer bot that argues against any PR by default (it's a feature). Address it head-on in your PR description and you'll have an easier review.
 
 See `CONTRIBUTING.md` for specifics.
 

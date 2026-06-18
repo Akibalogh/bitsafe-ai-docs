@@ -20,7 +20,7 @@ Most readers arrive with the same question: how is this different from Notion AI
 | Surface | Slack, Telegram, calendar, email, X — wherever you work | Inside Notion only |
 | Activation | Proactive (scheduled tasks, alerts, dashboards) + reactive | Reactive only |
 | Memory | Persistent across sessions, file-based | Per-conversation only |
-| Personas | Multiple named bots (Naval, Noob Saibot, legalbot, hrbot) | Single voice |
+| Personas | Multiple named bots (Naval, legalbot, hrbot) | Single voice |
 | Sub-agent orchestration | Fan-out swarms, bot-to-bot via MCP | No |
 | Data sources | 20+ caches (Slack, Notion, GDrive, Canton, Fathom...) | Notion content only |
 | Autonomy | Runs ops loops, ships own code, self-heals | Conversation-bound |
