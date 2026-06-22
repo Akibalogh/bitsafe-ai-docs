@@ -1,0 +1,26 @@
+name: README article index freshness
+
+# Fails if any docs/articles/NN-*.md is not listed in README.md AND docs/articles/README.md.
+# This is the CI side of the freshness guard (the local pre-commit hook is the dev-side mirror).
+# Runs on PRs from forks too, so external contributors get the check.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/articles/**'
+      - 'README.md'
+      - 'scripts/check-readme-articles.sh'
+  pull_request:
+    paths:
+      - 'docs/articles/**'
+      - 'README.md'
+      - 'scripts/check-readme-articles.sh'
+
+jobs:
+  check-readme-articles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify every article is indexed in the READMEs
+        run: bash scripts/check-readme-articles.sh

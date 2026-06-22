@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# pre-commit — runs the README-freshness guard before allowing a commit.
+# Installed via scripts/install-git-hooks.sh. Bypass (rarely) with: git commit --no-verify
+set -euo pipefail
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+exec "$REPO_ROOT/scripts/check-readme-articles.sh"

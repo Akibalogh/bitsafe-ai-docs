@@ -14,6 +14,7 @@ Each published article on `hub.bitsafe.finance` has a source Markdown file here,
 | 8 | [`08-capability-coverage-and-harness-guards.md`](08-capability-coverage-and-harness-guards.md) | [hub.bitsafe.finance/08-capability-coverage-and-harness-guards](https://hub.bitsafe.finance/08-capability-coverage-and-harness-guards) | drafting |
 | 9 | [`09-guard-parity.md`](09-guard-parity.md) | [hub.bitsafe.finance/09-guard-parity](https://hub.bitsafe.finance/09-guard-parity) | drafting |
 | 10 | [`10-completeness-trap.md`](10-completeness-trap.md) | [hub.bitsafe.finance/10-completeness-trap](https://hub.bitsafe.finance/10-completeness-trap) | drafting |
+| 11 | [`11-retros-recursively.md`](11-retros-recursively.md) | [hub.bitsafe.finance/11-retros-recursively](https://hub.bitsafe.finance/11-retros-recursively) | drafting |
 
 ## Authoring conventions
 
