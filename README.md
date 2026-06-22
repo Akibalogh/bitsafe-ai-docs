@@ -40,6 +40,8 @@ Forward-looking architecture proposals (separate from the retrospective case-stu
 
 Issues + PRs welcome. The system itself reviews proposed changes — there's an adversarial reviewer bot that argues against any PR by default (it's a feature). Address it head-on in your PR description and you'll have an easier review.
 
+**How new articles land:** push article commits straight to `main`. The README-freshness guard (pre-commit hook + `check-readme-articles` CI) is the **only** gate — it blocks any article that isn't listed in both README indexes, and otherwise content auto-merges with no human approval step. Run `bash scripts/install-git-hooks.sh` once after cloning to install the local guard.
+
 See `CONTRIBUTING.md` for specifics.
 
 ## License
