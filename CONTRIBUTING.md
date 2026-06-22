@@ -24,6 +24,23 @@ Follow the BitSafe Content Strategy + Brand Guide (internal — abridged here):
 - ≤2 pull-quote lines per article, max.
 - No marketing fluff.
 
+## Adding a new article (and the README freshness guard)
+
+Every `docs/articles/NN-*.md` source file MUST be listed in **both** indexes:
+
+- the series table in the top-level [`README.md`](README.md)
+- the source-file table in [`docs/articles/README.md`](docs/articles/README.md)
+
+This is enforced. Adding an article file without updating the indexes is a hard failure:
+
+- **CI:** `.github/workflows/check-readme-articles.yml` runs on every push/PR that touches
+  `docs/articles/**` or `README.md` and blocks merge if an article is unindexed.
+- **Locally:** run `bash scripts/install-git-hooks.sh` once after cloning to install a
+  pre-commit hook that runs the same check. Bypass (rarely) with `git commit --no-verify`.
+
+Run the check manually any time: `bash scripts/check-readme-articles.sh`.
+Test the guard itself: `bash scripts/test-check-readme-articles.sh`.
+
 ## Code snippets
 
 - Apache 2.0 licensed (matches the framework upstream).

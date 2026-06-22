@@ -22,6 +22,9 @@ This is **case study content**, not a framework manual. The upstream NanoClaw pr
 | 6 | Lessons | [Cost Discipline — Why the Bill Grew, What We Caught, How to Catch It Sooner](https://hub.bitsafe.finance/cost-discipline) | [`06-cost-discipline.md`](docs/articles/06-cost-discipline.md) | published |
 | 7 | Lessons | Monitors & Alerts — Catching What You Can't Prevent | [`07-monitors-and-alerts.md`](docs/articles/07-monitors-and-alerts.md) | drafting |
 | 8 | Lessons | Capability Coverage & Harness Guards — Why the Model Shouldn't Have to Remember What It Can Do | [`08-capability-coverage-and-harness-guards.md`](docs/articles/08-capability-coverage-and-harness-guards.md) | drafting |
+| 9 | Lessons | Guard Parity — A Guard Only Protects Where It's Wired | [`09-guard-parity.md`](docs/articles/09-guard-parity.md) | drafting |
+| 10 | Lessons | The Completeness Trap — You Can't Audit Your Own Blind Spots | [`10-completeness-trap.md`](docs/articles/10-completeness-trap.md) | drafting |
+| 11 | Lessons | Retros, Recursively — How the AI Studies Its Own Output | [`11-retros-recursively.md`](docs/articles/11-retros-recursively.md) | drafting |
 
 Articles are published as-ready to BitSafe's hub (`hub.bitsafe.finance`); drafts and source live here.
 
