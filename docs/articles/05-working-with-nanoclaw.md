@@ -1,5 +1,5 @@
 ---
-title: "Working With NanoClaw — Personas, Alerts, Memory, Decision Support, and How Humans Teach the AI"
+title: "Working With NanoClaw — Alerts, Memory, Decision Support, and How Humans Teach the AI"
 slug: 05-working-with-nanoclaw
 series: How BitSafe Runs on Notion
 part: 5
@@ -7,7 +7,7 @@ published: 2026-05-14
 audience: [App Developers, Trading Firms, Investors, Liquidity Providers]
 ---
 
-# Working With NanoClaw — Personas, Alerts, Memory, Decision Support, and How Humans Teach the AI
+# Working With NanoClaw — Alerts, Memory, Decision Support, and How Humans Teach the AI
 
 The first four parts of this series described what NanoClaw *is*. This part is about what it's like to *work with*. If you're an engineer deciding whether to build something like this, the architecture matters. If you're deciding whether your team would actually use it after the novelty wears off, this is the part that decides it.
 
@@ -23,45 +23,12 @@ Six months in, the deltas between "team with NanoClaw" and "team without" aren't
 2. **Continuous follow-up.** Commitments don't fall through. The bot tracks "you said you'd ping X by Y" and surfaces it the day Y arrives. The system of things you owe the world is no longer your prefrontal cortex; it's a database with cron jobs.
 3. **Zero context-switching cost.** It holds a hundred simultaneous threads with full context each. Humans lose twenty-plus minutes per switch. The bot loses zero.
 4. **Async-first work.** Fire a task at midnight, wake to results at 8am. Work happens in your absence — sub-tasks dispatched, errors handled, output delivered.
-5. **Cross-domain translation.** Engineering speaks finance via the right persona; finance hears engineering's constraints in an actionable register. What used to be a person on the leadership team is now a tool.
-6. **Always-on niche expertise.** Legalbot at 3am on a Saturday. Security review between flights. HR without scheduling. The bottleneck on niche expertise used to be a calendar.
+5. **Cross-domain translation.** Engineering asks a finance question and gets it answered in finance's register; finance hears engineering's constraints in an actionable one. What used to require a person on the leadership team is now a skill away.
+6. **Always-on niche expertise.** A contract review at 3am on a Saturday. A security pass between flights. An HR-policy question without scheduling. The bottleneck on niche expertise used to be a calendar.
 7. **No social cost to asking.** You can bug the bot freely. It doesn't get annoyed, doesn't compute "is this worth their time," doesn't gossip. Junior team members stop self-censoring dumb questions; senior members stop self-censoring tactical asks.
 8. **Auditable by default.** Every action is logged. Post-mortems become reconstruction, not detective work. "What happened at 14:23 UTC on the deploy" is a query, not a meeting.
 
-The rest of the article shows the mechanism behind each delta. Four interfaces — who you talk to, what gets pushed to you, what stays, and how you teach it. The leverage is in how they compose.
-
-## The personas you talk to
-
-> We didn't build one AI. We built a cast.
-
-The active interface — the one most people picture when they hear "AI assistant" — is the conversation. NanoClaw's distinguishing move is that the conversation isn't with one entity. It's with a cast of *personas*, each with a name, a voice, an icon, and a memory namespace, all running on the same agent substrate. People-modeled and function-modeled personas are equal-status examples of one pattern: vary the system prompt, the skill assignment, the memory namespace, and the sender identity. Substrate uniform; surface differentiated.
-
-**People-modeled personas** are recognizable thinking styles, grounded in a corpus.
-
-- **Naval** (in the spirit of Naval Ravikant) is the first-principles synthesizer. Brief, asks questions, network-thinking, uncomfortable with consensus. Summon Naval when a decision feels too easy — when the room has lined up but nobody has stress-tested why. The corpus lives at `data/naval-corpus/` (Almanack, Venture Hacks essays, podcast transcripts).
-- **The red-team** is the adversarial persona. Argues against any proposal by default. Naval summons it when his own synthesis feels too clean — "make the strongest case against this." It has earned its keep most clearly on security review, where the cost of a missed objection is high and the cost of an extra round of paranoia is low.
-- **Matthiasbot** is a retrievable knowledge base of Matthias Frank's published Notion information-architecture work, sourced from his website and YouTube channel. Grounds the bot in the framework (PARA, atomic databases, rollups vs. relations) so BitSafe agents can answer Notion-IA questions without scheduling time with Matthias. Every thread opens with the disclaimer: *"I'm Matthiasbot, trained on Matthias Frank's public content, not Matthias himself."*
-
-**Function-modeled personas** are domain roles.
-
-- **legalbot** is a contract analyzer, shipped 2026-05-13 at `/root/nanoclaw-skills/legalbot/`. Reads a Google Drive link (READ-ONLY — never writes back to the source), benchmarks against BitSafe's standard positions in Notion principle pages, and produces a separate redline grouped by priority (must-fix, material-risk, nice-to-fix). What makes legalbot trustworthy is the two-round independent-agent review: round one drafts; round two is a fresh agent with *no context from round one* that checks for self-introduced conflicts.
-- **hrbot** for HR questions. Same pattern, different corpus.
-
-All of them run on the same Claude substrate (Opus 4.7 today, whatever ships tomorrow). What differs is the system prompt, the skill assignment, the memory namespace, and the voice. The personas form a graph rather than a hierarchy: any persona can dispatch any other via MCP. A typical strategic-decision dispatch:
-
-```
-Aki → Naval ("should we partner with X?")
-       ↓ (~30 seconds in)
-       Naval → red-team ("strongest case against partnering with X")
-       ↓ (~60 seconds later)
-       Naval ← the red-team's three best objections
-       ↓
-       Aki ← Naval's synthesized recommendation, with the objections folded in
-```
-
-Round-trip: ~90 seconds. Cognitive load on Aki: read one synthesized message and push back on what doesn't land. The premortem move — "imagine this fails in six months, what does the autopsy say" — is one of the canonical red-team dispatches; we ship `premortem` as a standalone skill so the pattern is available even when Naval isn't in the loop.
-
-The personas aren't architectural primitives — they're examples of a pattern. The pattern: take a shared agent substrate, vary the system prompt and the grounding corpus, give the result a name and a voice, route by intent. Other companies will build their own cast.
+The rest of the article shows the mechanism behind each delta. Three interfaces — what gets pushed to you, what stays, and how you teach it — plus the decision-support workflows that sit on top of them. The leverage is in how they compose.
 
 ## The alerts you receive
 
@@ -106,13 +73,13 @@ Skills complete the picture as procedural memory. SKILL.md frontmatter plus comp
 
 ## Decision support
 
-The most distinctive use of NanoClaw isn't task automation — it's decision support. The Naval + red-team pair is the canonical workflow. A strategic question goes to Naval; Naval synthesizes; if the synthesis feels too clean, Naval dispatches the red-team for the strongest counter-argument; the final output is the synthesis with the best objection folded in. Two specific techniques have earned their place.
+The most distinctive use of NanoClaw isn't task automation — it's decision support. It's delivered as a set of skills and workflows that stress-test a decision, not as a chat with an oracle. The canonical move: a strategic question gets a first-principles synthesis, and when that synthesis feels too clean the agent is asked to build the strongest case *against* it, so the final output is the recommendation with the best objection already folded in. Two specific techniques have earned their place.
 
-**Premortem**, in the Gary Klein sense, lives as a standalone skill at `/root/nanoclaw-skills/premortem/`. Before a major commitment — a deal close, a hire, a deprecation — the red-team is asked to imagine the failure mode six months out in vivid detail (the specific customer that churned, the specific bug, the specific competitor move) and walk *backwards* to what we should have seen today. The vividness matters: an abstract premortem produces hedging; a vivid premortem produces actions.
+**Premortem**, in the Gary Klein sense, lives as a standalone skill at `/root/nanoclaw-skills/premortem/`. Before a major commitment — a deal close, a hire, a deprecation — the skill asks the agent to imagine the failure mode six months out in vivid detail (the specific customer that churned, the specific bug, the specific competitor move) and walk *backwards* to what we should have seen today. The vividness matters: an abstract premortem produces hedging; a vivid premortem produces actions.
 
-**Reference-class forecasting** is in flight. The M4 reference-class library is an ARQ initiative to populate base rates for the decisions BitSafe makes repeatedly — validator partnerships close at this rate, infrastructure migrations take this long, marketing channels with these characteristics produce this CAC. When it ships, Naval will surface the base rate alongside the synthesis: "similar deals close at 30%, here are the three closest analogs."
+**Reference-class forecasting** is in flight. The M4 reference-class library is an ARQ initiative to populate base rates for the decisions BitSafe makes repeatedly — validator partnerships close at this rate, infrastructure migrations take this long, marketing channels with these characteristics produce this CAC. When it ships, the base rate surfaces alongside the synthesis: "similar deals close at 30%, here are the three closest analogs."
 
-The longer arc: the ARQ research item on the AI Board Member (`35a636dd-0ba5-8162`) carries the "Findings: AI Board Member — Competency Gaps & Decision Support Framework" page that scoped what AI decision support should mean for BitSafe. Naval and the red-team are the operationalization of that framework. The framework will outlive the personas; the personas will be replaced as we learn what works.
+The longer arc: the ARQ research item on the AI Board Member (`35a636dd-0ba5-8162`) carries the "Findings: AI Board Member — Competency Gaps & Decision Support Framework" page that scoped what AI decision support should mean for BitSafe. These skills are the operationalization of that framework — and the framework is the durable part. The individual workflows will be replaced as we learn what works.
 
 ## The HITL teaching loop
 
@@ -124,7 +91,7 @@ The fourth interface is the most consequential and the least visible: how humans
 
 **Tiered approval gates.** The dev pipeline carries a `[uat]` commit-tag opt-in: when a commit message contains `[uat]`, auto-promote holds the branch until a human green-lights it via a Slack reaction. The default is the opposite — a clean dev run plus a 30-minute smoke watch is enough for promotion. UAT exists for things only a human can evaluate (Slack post quality, Notion page voice, search relevance); auto-promote covers everything else. The hotfix lane shortens smoke to 5 minutes but doesn't skip the gate.
 
-**Two-round independent review.** Legalbot's round-two consistency check is the externally-visible instance of an internal pattern we use whenever bot-authored output ships in a high-stakes context. Round one drafts; round two is a fresh agent with no context from round one. The independence is load-bearing — if round two reads round one's reasoning, it inherits round one's blind spots.
+**Two-round independent review.** The contract-review skill's round-two consistency check is the externally-visible instance of an internal pattern we use whenever bot-authored output ships in a high-stakes context. Round one drafts; round two is a fresh agent with no context from round one. The independence is load-bearing — if round two reads round one's reasoning, it inherits round one's blind spots.
 
 **Ask before X.** Certain actions require explicit human approval: restarting NanoClaw (active agents may be in flight), destructive ops (`git reset --hard`, `git push --force`), external-facing communications. The deliberate counter-balance is the autonomous-loop runtime, which sets `--dangerously-skip-permissions` so the scheduled-task loop doesn't silently stall on a prompt nobody will see. Different runtimes pick different defaults; the default is *trained*, not coded.
 
@@ -144,9 +111,9 @@ Two things NanoClaw doesn't do, and won't, even as everything else expands.
 
 ## Closing
 
-Four interfaces. Personas for active conversation. Alerts for passive notification. Memory for persistence. HITL for collaboration. Most AI tools give you one — the chatbot. NanoClaw gives you four, and the leverage is in how they compose.
+Three interfaces. Alerts for passive notification. Memory for persistence. HITL for collaboration. Most AI tools give you one — the chatbot. NanoClaw gives you three, and the leverage is in how they compose.
 
-A scheduled alert finds a problem; a persona is dispatched to fix it; the fix updates memory; the next time the same class of problem appears, the bot recognizes it and the alert never fires. That loop is the product. Not the model, not the prompt, not the integrations — the loop.
+A scheduled alert finds a problem; an agent is dispatched to fix it; the fix updates memory; the next time the same class of problem appears, the bot recognizes it and the alert never fires. That loop is the product. Not the model, not the prompt, not the integrations — the loop.
 
 > Most AI tools are smarter chatbots. NanoClaw is a working relationship.
 

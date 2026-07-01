@@ -276,7 +276,7 @@ Each agent exposes and consumes a small set of MCP tools. Inter-agent calls look
 ## 16.4 Skills Architecture
 
 
-- **Skills as versioned Notion rows** — each skill is a row in the Skills DB with SKILL.md content, scheduled_tasks frontmatter, and is_persona flag. A reconciler runs hourly, syncing from Notion to three disk paths on each agent host. Agents edit Notion; disk is read-only cache. New skills require zero code releases — they're live within one reconciler cycle. NanoClaw manages 74+ skills this way.
+- **Skills as versioned Notion rows** — each skill is a row in the Skills DB with SKILL.md content and scheduled_tasks frontmatter. A reconciler runs hourly, syncing from Notion to three disk paths on each agent host. Agents edit Notion; disk is read-only cache. New skills require zero code releases — they're live within one reconciler cycle. NanoClaw manages 74+ skills this way.
 - **Self-modification monitoring** — an R2 anomaly detector watches for signs that agents are modifying their own runtime: commit-author drift (non-human committer on CLAUDE.md / safety-critical files), file-mode flips on root-owned files, semgrep rules silently disabled. Run in shadow mode for 30 days (log anomalies but don't block) before activating hard blocks. This is the safety net for agents that try to subvert their own constraints.
 ---
 
@@ -370,7 +370,6 @@ Goal: the factory monitors and polices itself; humans review outputs, not operat
 
 - **Action-items extraction** — enforce ## Action items filed section in admin-bot responses; post-hook scanner verifies Tasks DB rows exist
 - **Self-modification monitoring** — R2 anomaly detector: commit-author drift, file-mode flips on root-owned files, semgrep rules silently disabled. Shadow mode 30 days → hard blocks active.
-- **Skill persona support** — is_persona flag on Skills DB rows, keyword/slash routing, preamble per thread; enables domain-scoped identities
 - **Full DR drills** — weekly Litestream restore test (Sunday 08:00 UTC); automated pass/fail ping to admin
 - **Per-skill cost breakdown** — weekly report: cost per skill derived from attribution JSONL + Anthropic account API reconciliation; surface the expensive ones
 - **ARQ feedback loop** — completed task patterns → new skill proposals filed automatically in Research Queue; factory learns its own workflows
