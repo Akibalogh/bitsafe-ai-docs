@@ -25,6 +25,7 @@ This is **case study content**, not a framework manual. The upstream NanoClaw pr
 | 9 | Lessons | Guard Parity — A Guard Only Protects Where It's Wired | [`09-guard-parity.md`](docs/articles/09-guard-parity.md) | drafting |
 | 10 | Lessons | The Completeness Trap — You Can't Audit Your Own Blind Spots | [`10-completeness-trap.md`](docs/articles/10-completeness-trap.md) | drafting |
 | 11 | Lessons | Retros, Recursively — How the AI Studies Its Own Output | [`11-retros-recursively.md`](docs/articles/11-retros-recursively.md) | drafting |
+| 12 | Lessons | Unclogging the Pipeline — When 'Merged' Quietly Stopped Meaning Merged | [`12-unclogging-the-pipeline.md`](docs/articles/12-unclogging-the-pipeline.md) | drafting |
 
 Articles are published as-ready to BitSafe's hub (`hub.bitsafe.finance`); drafts and source live here.
 
