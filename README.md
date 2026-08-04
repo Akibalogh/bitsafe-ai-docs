@@ -29,6 +29,10 @@ This is **case study content**, not a framework manual. The upstream NanoClaw pr
 
 Articles are published as-ready to BitSafe's hub (`hub.bitsafe.finance`); drafts and source live here.
 
+**[What's New](docs/whats-new.md)** — a short, high-level digest of what has changed in the
+implementation between article revisions. Read that if you are returning after a few weeks
+and want the deltas without re-reading the series.
+
 ## Specs
 
 Forward-looking architecture proposals (separate from the retrospective case-study articles).
